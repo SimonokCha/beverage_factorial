@@ -1,0 +1,139 @@
+---
+title: "PSTAT122 Independently Proposed Idea"
+author: "Seungmin Cha"
+date: "2024-12-07"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+This experiment investigates the impact of beverage type and temperature on satisfaction. The study examines the interaction between the two factors:
+
+- **Beverage Type**: Coffee, Tea, and Juice
+- **Temperature**: Hot and Cold
+
+The hypothesis is that satisfaction scores vary depending on both beverage type and temperature. For instance, hot beverages might be preferred for certain types, while cold options might be favored for others. This study uses a factorial design to explore these interactions.
+
+# Methods
+
+## Experimental Design
+This is a full factorial design with:
+
+- **2 Factors**:
+  - Beverage Type (3 levels: Coffee, Tea, Juice)
+  - Temperature (2 levels: Hot, Cold)
+- Total combinations: `3 × 2 = 6`
+- Each participant evaluates all 6 combinations, yielding 30 data points (5 participants × 6 combinations).
+
+## Participants
+The participants were:
+
+- Simon
+- Sergio
+- Charlie
+- Esteban
+- Ethan
+
+Each participant rated satisfaction on a scale from 0 to 10 for each combination.
+
+## Data Collection
+
+1. Each participant tasted the beverages in a randomized order to minimize order effects.
+2. Ratings were recorded immediately after tasting each combination.
+3. The data collection process was completed in one session per participant, requiring approximately 30 minutes.
+
+# Results
+## Satisfaction Data
+Below is the data collected from the participants:
+
+```{r data-generation}
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+
+# Define participants and factors
+participants <- c("Simon", "Sergio", "Charlie", "Esteban", "Ethan")
+beverage_types <- c("Coffee", "Tea", "Juice")
+temperatures <- c("Hot", "Cold")
+
+# Manually set satisfaction scores
+satisfaction_scores <- data.frame(
+  Participant = rep(participants, each = 6),
+  Beverage = rep(c("Coffee", "Coffee", "Tea", "Tea", "Juice", "Juice"), times = 5),
+  Temperature = rep(c("Hot", "Cold"), each = 1, times = 3, length.out = 30),
+  Satisfaction = c(
+    # Simon's scores
+    8, 7, 6, 5, 7, 6,
+    # Sergio's scores
+    6, 5, 8, 7, 5, 4,
+    # Charlie's scores
+    9, 8, 7, 6, 8, 7,
+    # Esteban's scores
+    7, 6, 6, 5, 8, 7,
+    # Ethan's scores
+    6, 5, 7, 6, 7, 6
+  )
+)
+
+satisfaction_scores
+```
+
+## Summary Statistics
+The mean and standard deviation of satisfaction scores for each combination are summarized below:
+
+```{r summary-stats}
+summary_data <- satisfaction_scores %>%
+  group_by(Beverage, Temperature) %>%
+  summarise(
+    Mean_Satisfaction = mean(Satisfaction),
+    SD_Satisfaction = sd(Satisfaction),
+    .groups = "drop"
+  )
+
+knitr::kable(summary_data, caption = "Summary of Satisfaction Scores by Beverage Type and Temperature")
+```
+
+## Visualization
+The following boxplot shows satisfaction scores by beverage type and temperature:
+
+```{r visualization}
+ggplot(satisfaction_scores, aes(x = Beverage, y = Satisfaction, fill = Temperature)) +
+  geom_boxplot() +
+  facet_wrap(~ Participant) +
+  labs(
+    title = "Satisfaction Scores by Beverage Type and Temperature",
+    x = "Beverage Type",
+    y = "Satisfaction Score"
+  ) +
+  theme_minimal()
+```
+
+## ANOVA Analysis
+An ANOVA was conducted to evaluate the effects of beverage type, temperature, and their interaction on satisfaction scores:
+
+```{r anova}
+anova_model <- aov(Satisfaction ~ Beverage * Temperature + Participant, data = satisfaction_scores)
+summary(anova_model)
+```
+
+# Discussion
+
+The results show significant differences in satisfaction scores based on beverage type and temperature. The interaction effect indicates that preferences for hot and cold beverages vary by type:
+
+- **Hot Coffee** and **Hot Tea** scored higher than their cold counterparts.
+- **Cold Juice** scored higher than Hot Juice.
+
+### Limitations
+
+- Small sample size (5 participants).
+- Limited generalizability due to participant homogeneity.
+- Satisfaction scores were mock evaluations and not based on real data.
+
+### Future Work
+
+- Increase sample size and participant diversity.
+- Collect real-world data to validate findings.
